@@ -30,7 +30,7 @@ if test "x${has_math}" != xyes; then
    AC_MSG_ERROR([
    ---------------------------------------------
    Unable to find libm (math) required for compiling
-   bambed. Install this and run ./configure
+   symcurv. Install this and run ./configure
    with the appropriate LDFLAGS/CFLAGS/etc.
    See the INSTALL for examples.
    ---------------------------------------------])
@@ -40,17 +40,7 @@ if test "x${has_zlib}" != xyes; then
    AC_MSG_ERROR([
    ---------------------------------------------
    Unable to find zlib required for compiling
-   bambed. Install this and run ./configure
-   with the appropriate LDFLAGS/CFLAGS/etc.
-   See the INSTALL for examples.
-   ---------------------------------------------])
-fi
-AC_SEARCH_LIBS([hts_parse_reg],[hts], [has_htslib=yes],[has_htslib=no])
-if test "x${has_htslib}" != xyes; then
-   AC_MSG_ERROR([
-   ---------------------------------------------
-   Unable to find htslib required for compiling
-   bambed. Install this and run ./configure
+   symcurv. Install this and run ./configure
    with the appropriate LDFLAGS/CFLAGS/etc.
    See the INSTALL for examples.
    ---------------------------------------------])
@@ -73,15 +63,32 @@ AC_LINK_IFELSE([
     [AC_MSG_RESULT([-ljkweb])
         has_jkweb=yes;],
      [AC_MSG_RESULT([no])
-        LIBS=$OLD_LIBS; dnl reset to old value since XXX was not found
-        has_jkweb=no;
+        dnl maybe bam is built into the jkweb.  If so, we need to add it
+ 	dnl too
+        LIBS="-ljkweb -lbam $OLDLIBS";
+	AC_MSG_CHECKING([checking again for jkweb library containing needMem])
+        AC_LINK_IFELSE([
+           AC_LANG_PROGRAM([[
+               #include <jkweb/common.h>
+             ]],
+             [[
+	       char *d = needMem(sizeof(char));
+ 	       free(d);
+	       return 0;
+	     ]])],
+           [AC_MSG_RESULT([-ljkweb -lbam])
+              has_beato=yes;],
+           [AC_MSG_RESULT([no])
+             has_beato=no;
+	     LIBS=$OLDLIBS;
+        ])
 ])
 if test "x${has_jkweb}" != xyes; then
    AC_MSG_ERROR([
    ---------------------------------------------
    Unable to find libjkweb.a (from libbeato)
    required for compiling
-   bambed. Install this and run ./configure
+   symcurv. Install this and run ./configure
    with the appropriate LDFLAGS/CFLAGS/etc.
    See the INSTALL for examples.
    ---------------------------------------------])
@@ -125,7 +132,7 @@ if test "x${has_beato}" != xyes; then
    ---------------------------------------------
    Unable to find libbeato.a
    required for compiling
-   bambed. Install this and run ./configure
+   symcurv. Install this and run ./configure
    with the appropriate LDFLAGS/CFLAGS/etc.
    See the INSTALL for examples.
    ---------------------------------------------])
